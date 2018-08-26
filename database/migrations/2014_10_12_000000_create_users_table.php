@@ -18,6 +18,13 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('image_url')->nullable();
+            $table->string('status_comment')->default("");
+            $table->integer('charity_id')->default(1);
+            $table->boolean('is_stylist')->default(false);
+            $table->string('salon_name')->nullable();
+            $table->string('salon_address')->nullable();
+            $table->geometry('salon_location', 6, 3)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
