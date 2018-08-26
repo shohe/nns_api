@@ -13,7 +13,7 @@ class CreateOffersTable extends Migration
      */
     public function up()
     {
-        Schema::table('offers', function (Blueprint $table) {
+        Schema::create('offers', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('cx_id');
             $table->string('menu');
@@ -37,8 +37,6 @@ class CreateOffersTable extends Migration
      */
     public function down()
     {
-        Schema::table('offers', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('offers');
     }
 }
