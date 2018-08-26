@@ -195,11 +195,22 @@ class UserController extends Controller
             return response()->json(['error'=>$validator->errors()], 401);
         }
 
+        $disk = Storage::disk('s3');
+        $user = Auth::user();
+        $resouce = "https://s3-ap-northeast-1.amazonaws.com/nns-jp";
+
+        // delete image if it's set already
+        if ($user->image_url != "") {
+            $url = str_replace($resouce, '', $user->image_url);
+            $disk = Storage::disk('s3');
+            $disk->delete($url);
+        }
+
         // store image
         $image = $request->file('image');
-        $path = Storage::disk('s3')->putFile('users', $image, 'public');
-        $url = Storage::disk('s3')->url($path);
-        $url = "https://s3-ap-northeast-1.amazonaws.com/nns-jp".$url;
+        $path = $disk->putFile('users', $image, 'public');
+        $url = $disk->url($path);
+        $url = $resouce.$url;
         return response()->json(['success' => $url], $this->successStatus);
     }
 }
