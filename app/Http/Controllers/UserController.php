@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Validator;
 
 class UserController extends Controller
@@ -42,9 +43,9 @@ class UserController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|string',
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|min:8|max:16',
         ]);
 
         if ($validator->fails()) {
@@ -132,5 +133,84 @@ class UserController extends Controller
         } else {
             return response()->json(['error'=>'Unauthorised'], 401);
         }
+    }
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'name' => 'string',
+            'email' => 'email',
+            'password' => 'min:8|max:16',
+            'image_url' => 'string',
+            'status_comment' => 'string|max:255',
+            'charity_id' => 'integer',
+            'is_stylist' => 'boolean',
+            'salon_name' => 'string|max:30',
+            'salon_address' => 'string|max:100',
+            'salon_location' => 'string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
+
+        // update user
+        $user = Auth::user();
+        $input = $request->all();
+        if (isset($input['name'])) { $user->name = $input['name']; }
+        if (isset($input['email'])) { $user->email = $input['email']; }
+        if (isset($input['password'])) { $user->password = $input['password']; }
+        if (isset($input['image_url'])) { $user->image_url = $input['image_url']; }
+        if (isset($input['status_comment'])) { $user->status_comment = $input['status_comment']; }
+        if (isset($input['charity_id'])) { $user->charity_id = $input['charity_id']; }
+        if (isset($input['is_stylist'])) { $user->is_stylist = $input['is_stylist']; }
+        if (isset($input['salon_name'])) { $user->salon_name = $input['salon_name']; }
+        if (isset($input['salon_address'])) { $user->salon_address = $input['salon_address']; }
+        if (isset($input['salon_location'])) { $user->salon_location = $input['salon_location']; }
+        $user->save();
+        return response()->json(['success' => $user], $this->successStatus);
+    }
+
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function storeImage(Request $request)
+    {
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'image' => 'image',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
+        $disk = Storage::disk('s3');
+        $user = Auth::user();
+        $resouce = "https://s3-ap-northeast-1.amazonaws.com/nns-jp";
+
+        // delete image if it's set already
+        if ($user->image_url != "") {
+            $url = str_replace($resouce, '', $user->image_url);
+            $disk = Storage::disk('s3');
+            $disk->delete($url);
+        }
+
+        // store image
+        $image = $request->file('image');
+        $path = $disk->putFile('users', $image, 'public');
+        $url = $disk->url($path);
+        $url = $resouce.$url;
+        return response()->json(['success' => $url], $this->successStatus);
     }
 }
