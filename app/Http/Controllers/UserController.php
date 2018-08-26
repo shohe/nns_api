@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Validator;
 
 class UserController extends Controller
@@ -155,21 +156,49 @@ class UserController extends Controller
             'salon_location' => 'string',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
 
         // update user
         $user = Auth::user();
         $input = $request->all();
         if (isset($input['name'])) { $user->name = $input['name']; }
-        if (isset($input['email'])) { $user->name = $input['email']; }
-        if (isset($input['password'])) { $user->name = $input['password']; }
-        if (isset($input['image_url'])) { $user->name = $input['image_url']; }
-        if (isset($input['status_comment'])) { $user->name = $input['status_comment']; }
-        if (isset($input['charity_id'])) { $user->name = $input['charity_id']; }
-        if (isset($input['is_stylist'])) { $user->name = $input['is_stylist']; }
-        if (isset($input['salon_name'])) { $user->name = $input['salon_name']; }
-        if (isset($input['salon_address'])) { $user->name = $input['salon_address']; }
-        if (isset($input['salon_location'])) { $user->name = $input['salon_location']; }
+        if (isset($input['email'])) { $user->email = $input['email']; }
+        if (isset($input['password'])) { $user->password = $input['password']; }
+        if (isset($input['image_url'])) { $user->image_url = $input['image_url']; }
+        if (isset($input['status_comment'])) { $user->status_comment = $input['status_comment']; }
+        if (isset($input['charity_id'])) { $user->charity_id = $input['charity_id']; }
+        if (isset($input['is_stylist'])) { $user->is_stylist = $input['is_stylist']; }
+        if (isset($input['salon_name'])) { $user->salon_name = $input['salon_name']; }
+        if (isset($input['salon_address'])) { $user->salon_address = $input['salon_address']; }
+        if (isset($input['salon_location'])) { $user->salon_location = $input['salon_location']; }
         $user->save();
         return response()->json(['success' => $user], $this->successStatus);
+    }
+
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function storeImage(Request $request)
+    {
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'image' => 'image',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
+        // store image
+        $image = $request->file('image');
+        $path = $image->store('users', 's3');
+        $url = Storage::disk('s3')->url($path);
+        return response()->json(['success' => $url], $this->successStatus);
     }
 }
