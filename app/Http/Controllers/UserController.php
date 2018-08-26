@@ -197,8 +197,9 @@ class UserController extends Controller
 
         // store image
         $image = $request->file('image');
-        $path = $image->store('users', 's3');
+        $path = Storage::disk('s3')->putFile('users', $image, 'public');
         $url = Storage::disk('s3')->url($path);
+        $url = "https://s3-ap-northeast-1.amazonaws.com/nns-jp".$url;
         return response()->json(['success' => $url], $this->successStatus);
     }
 }
