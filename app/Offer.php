@@ -13,5 +13,14 @@ class Offer extends Model
     {
         return $this->belongsTo(Users::class);
     }
-    
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'cx_id', 'menu', 'price', 'date_time', 'hair_type', 'charity_id', 'distance_range', 'from_location', 'stylist_id', 'comment',
+    ];
+
 }

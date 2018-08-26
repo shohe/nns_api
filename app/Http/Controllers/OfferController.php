@@ -42,6 +42,28 @@ class OfferController extends Controller
      */
     public function create(Request $request)
     {
-        return response()->json(['status'=>$this->successStatus]);
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'menu' => 'required|string|max:20',
+            'price' => 'required|numeric',
+            'date_time' => 'required|date_format:Y-m-d H:i:s',
+            'distance_range' => 'numeric',
+            'stylist_id' => 'integer',
+            'hair_type' => 'required',
+            'comment' => 'string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
+        // Registration
+        $input = $request->all();
+        $user = Auth::user();
+        $input['cx_id'] = $user->id;
+        $input['charity_id'] = $user->charity_id;
+        $offer = Offer::create($input);
+
+        return response()->json(['success' => $offer], $this->successStatus);
     }
 }

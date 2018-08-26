@@ -19,8 +19,8 @@ class CreateOffersTable extends Migration
             $table->string('menu');
             $table->float('price');
             $table->dateTime('date_time');
-            $table->float('distance_range');
-            $table->geometry('from_location');
+            $table->float('distance_range')->nullable();
+            $table->geometry('from_location')->nullable();
             $table->integer('stylist_id')->nullable();
             $table->integer('hair_type');
             $table->string('comment')->default("");
