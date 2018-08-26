@@ -42,9 +42,9 @@ class UserController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|string',
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|min:8|max:16',
         ]);
 
         if ($validator->fails()) {
@@ -132,5 +132,44 @@ class UserController extends Controller
         } else {
             return response()->json(['error'=>'Unauthorised'], 401);
         }
+    }
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'name' => 'string',
+            'email' => 'email',
+            'password' => 'min:8|max:16',
+            'image_url' => 'string',
+            'status_comment' => 'string|max:255',
+            'charity_id' => 'integer',
+            'is_stylist' => 'boolean',
+            'salon_name' => 'string|max:30',
+            'salon_address' => 'string|max:100',
+            'salon_location' => 'string',
+        ]);
+
+
+        // update user
+        $user = Auth::user();
+        $input = $request->all();
+        if (isset($input['name'])) { $user->name = $input['name']; }
+        if (isset($input['email'])) { $user->name = $input['email']; }
+        if (isset($input['password'])) { $user->name = $input['password']; }
+        if (isset($input['image_url'])) { $user->name = $input['image_url']; }
+        if (isset($input['status_comment'])) { $user->name = $input['status_comment']; }
+        if (isset($input['charity_id'])) { $user->name = $input['charity_id']; }
+        if (isset($input['is_stylist'])) { $user->name = $input['is_stylist']; }
+        if (isset($input['salon_name'])) { $user->name = $input['salon_name']; }
+        if (isset($input['salon_address'])) { $user->name = $input['salon_address']; }
+        if (isset($input['salon_location'])) { $user->name = $input['salon_location']; }
+        $user->save();
+        return response()->json(['success' => $user], $this->successStatus);
     }
 }
