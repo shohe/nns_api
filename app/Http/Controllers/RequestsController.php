@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Requests;
+use App\Offer;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 
@@ -56,6 +57,13 @@ class RequestsController extends Controller
         $input = $request->all();
         $input['stylist_id'] = Auth::user()->id;
         $request = Requests::create($input);
+
+        // update offer
+        if (Requests::where('offer_id', $input['offer_id'])->count() >= env('REQUEST_MAX')) {
+            $offer = Offer::find($input['offer_id']);
+            $offer->is_closed = true;
+            $offer->save();
+        }
 
         return response()->json(['success' => $request], $this->successStatus);
     }
