@@ -11,6 +11,14 @@ class User extends Authenticatable
     use HasApiTokens, Notifiable;
 
     /**
+    * @return \Illuminate\Database\Eloquent\Relations\HasMany
+    */
+    public function offers()
+    {
+        return $this->hasMany(Offers::class);
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
