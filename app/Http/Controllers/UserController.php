@@ -153,7 +153,8 @@ class UserController extends Controller
             'is_stylist' => 'boolean',
             'salon_name' => 'string|max:30',
             'salon_address' => 'string|max:100',
-            'salon_location' => 'string',
+            'salon_location_lat' => 'numeric',
+            'salon_location_lng' => 'numeric',
         ]);
 
         if ($validator->fails()) {
@@ -173,7 +174,10 @@ class UserController extends Controller
         if (isset($input['is_stylist'])) { $user->is_stylist = $input['is_stylist']; }
         if (isset($input['salon_name'])) { $user->salon_name = $input['salon_name']; }
         if (isset($input['salon_address'])) { $user->salon_address = $input['salon_address']; }
-        if (isset($input['salon_location'])) { $user->salon_location = $input['salon_location']; }
+        if (isset($input['salon_location_lat']) && isset($input['salon_location_lng'])) {
+            $geoArray = array('lat' => $input['salon_location_lat'], 'lng' => $input['salon_location_lng']);
+            $user->setSalonLocation($geoArray);
+        }
         $user->save();
         return response()->json(['success' => $user], $this->successStatus);
     }

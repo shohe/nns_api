@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->boolean('is_stylist')->default(false);
             $table->string('salon_name')->nullable();
             $table->string('salon_address')->nullable();
-            $table->geometry('salon_location', 6, 3)->nullable();
+            $table->geometry('salon_location')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
