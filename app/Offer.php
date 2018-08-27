@@ -27,28 +27,27 @@ class Offer extends Model
     /**
     * geometry attribute method
     */
-    static function castToGeometry($value)
+    static function castToGeometry(array $value)
     {
         return DB::raw("(GeomFromText('POINT(" . $value['lat'] . " " . $value['lng'] . ")'))");
     }
 
     static function getLocationAttribute(string $value)
     {
-        $value = substr($value, strlen('POINT('), strlen($value) - (strlen('POINT(') + 1));
-        $value = explode(" ", $value);
+        $_value = substr($value, strlen('POINT('), strlen($value) - (strlen('POINT(') + 1));
+        $_value = explode(" ", $value);
         $ret = [];
-        $ret['lat'] = $value[0];
-        $ret['lng'] = $value[1];
+        $ret['lat'] = $_value[0];
+        $ret['lng'] = $_value[1];
         return $ret;
     }
 
     public function newQuery($excludeDeleted = true)
     {
         $raw='';
-        foreach(array('user_location') as $column){
+        foreach(array('from_location') as $column){
             $raw .= ' astext('.$column.') as '.$column.' ';
         }
-
         return parent::newQuery($excludeDeleted)->addSelect('*',DB::raw($raw));
     }
 

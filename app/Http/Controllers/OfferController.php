@@ -13,6 +13,7 @@ class OfferController extends Controller
 {
 
     public $successStatus = 200;
+    private $oneKm = 0.0089831601679492;
 
     /**
      * Handle the incoming request.
@@ -40,7 +41,7 @@ class OfferController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function store(Request $request)
     {
         // Validation
         $validator = Validator::make($request->all(), [
@@ -70,5 +71,36 @@ class OfferController extends Controller
         }
         $offer = Offer::create($input);
         return response()->json(['success' => $offer], $this->successStatus);
+    }
+
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function match(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_stylist) {
+            return response()->json(['error'=>'this user is not stylist'], 401);
+        }
+
+        // nominated
+        $nominatedOffer = Offer::query();
+        $nominatedOffer->where('is_closed', false);
+        $nominatedOffer->where('stylist_id', $user->id);
+        $nominatedOffer->orderBy('id', 'desc');
+
+        // match required
+        $SL = $user->getSalonLocation();
+        $matchRequiredOffer = Offer::query();
+        $matchRequiredOffer->where('is_closed', false);
+        $matchRequiredOffer->where('stylist_id', null);
+        $matchRequiredOffer->whereRaw("GLENGTH(GEOMFROMTEXT(CONCAT('LINESTRING(',?,' ',?, ',',X(from_location),' ',Y(from_location),')'))) <= distance_range * ?", [$SL['lat'], $SL['lng'], $this->oneKm]);
+
+        // marge offers
+        $results = $nominatedOffer->union($matchRequiredOffer)->get();
+        return response()->json(['success' => $results], $this->successStatus);
     }
 }
