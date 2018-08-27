@@ -27,4 +27,4 @@ Route::post('/user/image', 'UserController@storeImage')->middleware('auth:api');
 
 // OFFER
 Route::resource('/offer', 'OfferController')->middleware('auth:api');
-Route::post('/offer', 'OfferController@create')->middleware('auth:api');
+Route::get('/offer', 'OfferController@match')->middleware('auth:api');
