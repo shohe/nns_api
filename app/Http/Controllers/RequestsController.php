@@ -67,4 +67,19 @@ class RequestsController extends Controller
 
         return response()->json(['success' => $request], $this->successStatus);
     }
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id = 0)
+    {
+        if ($id == 0) {
+            return response()->json(['success' => Requests::all()], $this->successStatus);
+        } else {
+            return response()->json(['success' => Requests::find($id)], $this->successStatus);
+        }
+    }
+
 }
