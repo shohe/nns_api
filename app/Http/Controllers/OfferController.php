@@ -48,6 +48,8 @@ class OfferController extends Controller
             'price' => 'required|numeric',
             'date_time' => 'required|date_format:Y-m-d H:i:s',
             'distance_range' => 'numeric',
+            'from_location_lat' => 'numeric',
+            'from_location_lng' => 'numeric',
             'stylist_id' => 'integer',
             'hair_type' => 'required',
             'comment' => 'string|max:255',
@@ -62,8 +64,11 @@ class OfferController extends Controller
         $user = Auth::user();
         $input['cx_id'] = $user->id;
         $input['charity_id'] = $user->charity_id;
+        if (isset($input['from_location_lat']) && isset($input['from_location_lng'])) {
+            $geoArray = array('lat' => $input['from_location_lat'], 'lng' => $input['from_location_lng']);
+            $input['from_location'] = Offer::castToGeometry($geoArray);
+        }
         $offer = Offer::create($input);
-
         return response()->json(['success' => $offer], $this->successStatus);
     }
 }
