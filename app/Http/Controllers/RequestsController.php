@@ -103,25 +103,35 @@ class RequestsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function reservation(Request $request)
+    public function reservation(Request $request, $id = 0)
     {
-        // Validation
-        $validator = Validator::make($request->all(), [
-            'date_time' => 'required|date_format:Y-m-d H:i:s',
-        ]);
+        if ($id == 0) { // without id
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'date_time' => 'required|date_format:Y-m-d H:i:s',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            if ($validator->fails()) {
+                return response()->json(['error'=>$validator->errors()], 401);
+            }
+
+            $input = $request->all();
+            $time = date("Y/m/d H:i:s");
+            $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->orderBy('id', 'desc')->first();
+            $user = User::find($results->cx_id);
+            $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            $results['cx_name'] = $user->name;
+            $results['cx_image_url'] = $user->image_url;
+            return response()->json(['success' => $results], $this->successStatus);
+        } else { // with id
+            $input = $request->all();
+            $results = Offer::where('cx_id', Auth::user()->id)->where('id', $id)->orderBy('id', 'desc')->first();
+            $user = User::find($results->cx_id);
+            $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            $results['cx_name'] = $user->name;
+            $results['cx_image_url'] = $user->image_url;
+            return response()->json(['success' => $results], $this->successStatus);
         }
-
-        $input = $request->all();
-        $time = date("Y/m/d H:i:s");
-        $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->orderBy('id', 'desc')->first();
-        $user = User::find($results->cx_id);
-        $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
-        $results['cx_name'] = $user->name;
-        $results['cx_image_url'] = $user->image_url;
-        return response()->json(['success' => $results], $this->successStatus);
     }
 
     /**
