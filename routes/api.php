@@ -38,4 +38,4 @@ Route::get('/reservation/{id}', 'RequestsController@reservation')->middleware('a
 Route::get('/reserveList', 'RequestsController@reserveList')->middleware('auth:api');
 
 // HISTORY
-Route::get('/offerHistory', 'OfferController@offerHistory')->middleware('auth:api');
+Route::get('/offerHistoryList', 'OfferController@offerHistoryList')->middleware('auth:api');

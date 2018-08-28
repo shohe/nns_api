@@ -126,9 +126,17 @@ class OfferController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function offerHistory()
+    public function offerHistoryList()
     {
-        return response()->json(['success' => 1], $this->successStatus);
+        $results = DB::table('offers as o')
+        ->select('r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
+        ->where('o.cx_id', Auth::user()->id)
+        ->where('o.is_closed', true)
+        ->where('r.is_matched', true)
+        ->join('requests as r', 'o.id', '=', 'r.offer_id')
+        ->join('users as u', 'u.id', '=', 'r.stylist_id')
+        ->get();
+        return response()->json(['success' => $results], $this->successStatus);
     }
 
 }
