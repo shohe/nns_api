@@ -39,3 +39,4 @@ Route::get('/reserveList', 'RequestsController@reserveList')->middleware('auth:a
 
 // HISTORY
 Route::get('/offerHistoryList', 'OfferController@offerHistoryList')->middleware('auth:api');
+Route::get('/offerHistory/{id}', 'OfferController@offerHistory')->middleware('auth:api');
