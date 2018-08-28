@@ -120,7 +120,7 @@ class RequestsController extends Controller
             }
 
             $input = $request->all();
-            $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->where('is_closed', false)->orderBy('id', 'desc')->first();
+            $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->orderBy('id', 'desc')->first();
             $user = User::find($results->cx_id);
             $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
             $results['cx_name'] = $user->name;
