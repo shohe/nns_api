@@ -29,3 +29,4 @@ Route::post('/user/image', 'UserController@storeImage')->middleware('auth:api');
 Route::resource('/offer', 'OfferController')->middleware('auth:api');
 Route::get('/offer', 'OfferController@match')->middleware('auth:api');
 Route::resource('/request', 'RequestsController')->middleware('auth:api');
+Route::get('/request', 'RequestsController@show')->middleware('auth:api');

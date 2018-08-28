@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Requests;
 use App\Offer;
+use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class RequestsController extends Controller
@@ -76,7 +78,8 @@ class RequestsController extends Controller
     public function show($id = 0)
     {
         if ($id == 0) {
-            return response()->json(['success' => Requests::all()], $this->successStatus);
+            $all = DB::table('requests as r')->select('r.id as request_id', 'u.name', 'u.image_url')->join('users as u', 'u.id', '=', 'r.stylist_id')->get();
+            return response()->json(['success' => $all], $this->successStatus);
         } else {
             return response()->json(['success' => Requests::find($id)], $this->successStatus);
         }
