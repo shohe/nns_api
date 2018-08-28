@@ -99,13 +99,12 @@ class RequestsController extends Controller
     }
 
     /**
-     *
+     * reservation as cx
      *
      * @return \Illuminate\Http\Response
      */
     public function reservation(Request $request)
     {
-        // reservation as cx
         // Validation
         $validator = Validator::make($request->all(), [
             'date_time' => 'required|date_format:Y-m-d H:i:s',
@@ -122,6 +121,32 @@ class RequestsController extends Controller
         $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
         $results['cx_name'] = $user->name;
         $results['cx_image_url'] = $user->image_url;
+        return response()->json(['success' => $results], $this->successStatus);
+    }
+
+    /**
+     * reservation as stylist
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function reserveList(Request $request)
+    {
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'date_time' => 'required|date_format:Y-m-d H:i:s',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
+        $results = DB::table('requests as r')
+        ->select('r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
+        ->where('r.stylist_id', Auth::user()->id)
+        ->join('offers as o', 'o.id', '=', 'r.offer_id')
+        ->join('users as u', 'u.id', '=', 'o.cx_id')
+        ->get();
+
         return response()->json(['success' => $results], $this->successStatus);
     }
 
