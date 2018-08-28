@@ -44,3 +44,4 @@ Route::get('/offerHistory/{id}', 'OfferController@offerHistory')->middleware('au
 
 // REVIEWS
 Route::resource('/review', 'ReviewController')->middleware('auth:api');
+Route::get('/review/{id}', 'OfferController@show')->middleware('auth:api');

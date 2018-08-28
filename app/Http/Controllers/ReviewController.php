@@ -31,7 +31,7 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(['success' => 0], $this->successStatus);
     }
 
     /**
@@ -58,4 +58,15 @@ class ReviewController extends Controller
         $review = Review::create($input);
         return response()->json(['success' => $review], $this->successStatus);
     }
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        return response()->json(['success' => 1], $this->successStatus);
+    }
+
 }
