@@ -81,7 +81,11 @@ class RequestsController extends Controller
             $all = DB::table('requests as r')->select('r.id as request_id', 'u.name', 'u.image_url')->join('users as u', 'u.id', '=', 'r.stylist_id')->get();
             return response()->json(['success' => $all], $this->successStatus);
         } else {
-            return response()->json(['success' => Requests::find($id)], $this->successStatus);
+            $result = Requests::find($id);
+            $stylist = User::find($result->stylist_id);
+            $stylist['salon_location'] = $stylist->getSalonLocation();
+            $result['stylist'] = $stylist;
+            return response()->json(['success' => $result], $this->successStatus);
         }
     }
 
