@@ -14,9 +14,19 @@ class User extends Authenticatable
     /**
     * @return \Illuminate\Database\Eloquent\Relations\HasMany
     */
-    public function offers()
+    public function offer()
     {
-        return $this->hasMany(Offers::class);
+        return $this->hasMany(Offer::class);
+    }
+
+    public function review()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(Requests::class);
     }
 
     /**
