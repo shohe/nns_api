@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
+use App\Offer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class UserController extends Controller
@@ -223,8 +225,40 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function dayCounter()
+    public function dayCounter(Request $request)
     {
-        return response()->json(['success' => 1], $this->successStatus);
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'date_time' => 'required|date_format:Y-m-d H:i:s',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
+        $input = $request->all();
+        $offer = DB::table('offers as o')
+        ->select('o.date_time')
+        ->where('o.date_time', '>', $input['date_time'])
+        ->where('o.cx_id', Auth::user()->id)
+        ->where('r.is_matched', true)
+        ->join('requests as r', 'r.offer_id', '=', 'o.id');
+
+        if ($offer->count() > 0) {
+            $date = strtotime($offer->first()->date_time);
+            $today = strtotime($input['date_time']);
+            $dif = $this->time_diff($today, $date);
+            return response()->json(['success' => $dif, 'origin' => $offer->first()->date_time], $this->successStatus);
+        }
+        return response()->json(['success' => 0], $this->successStatus);
+    }
+
+    private function time_diff($time_from, $time_to)
+    {
+        // get secoundly differences.
+        $dif = $time_to - $time_from;
+        // get daily differences.
+        $dif_days = (strtotime(date("Y-m-d", $dif)) - strtotime("1970-01-01")) / 86400;
+        return $dif_days;
     }
 }
