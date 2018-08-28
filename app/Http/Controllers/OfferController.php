@@ -121,4 +121,14 @@ class OfferController extends Controller
         }
     }
 
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function offerHistory()
+    {
+        return response()->json(['success' => 1], $this->successStatus);
+    }
+
 }

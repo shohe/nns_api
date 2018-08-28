@@ -28,9 +28,14 @@ Route::post('/user/image', 'UserController@storeImage')->middleware('auth:api');
 // OFFER
 Route::resource('/offer', 'OfferController')->middleware('auth:api');
 Route::get('/offer', 'OfferController@show')->middleware('auth:api');
+
+// REQUEST
 Route::resource('/request', 'RequestsController')->middleware('auth:api');
 Route::get('/request', 'RequestsController@show')->middleware('auth:api');
 Route::put('/request/{id}', 'RequestsController@update')->middleware('auth:api');
 Route::get('/reservation', 'RequestsController@reservation')->middleware('auth:api');
 Route::get('/reservation/{id}', 'RequestsController@reservation')->middleware('auth:api');
 Route::get('/reserveList', 'RequestsController@reserveList')->middleware('auth:api');
+
+// HISTORY
+Route::get('/offerHistory', 'OfferController@offerHistory')->middleware('auth:api');
