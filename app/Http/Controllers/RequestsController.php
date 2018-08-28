@@ -85,4 +85,17 @@ class RequestsController extends Controller
         }
     }
 
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function update($id = 0)
+    {
+        $requests = Requests::find($id);
+        $requests->is_matched = true;
+        $requests->save();
+        return response()->json(['success' => true], $this->successStatus);
+    }
+
 }
