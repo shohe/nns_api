@@ -98,4 +98,57 @@ class RequestsController extends Controller
         return response()->json(['success' => true], $this->successStatus);
     }
 
+    /**
+     * reservation as cx
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function reservation(Request $request, $id = 0)
+    {
+        if ($id == 0) { // without id
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'date_time' => 'required|date_format:Y-m-d H:i:s',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error'=>$validator->errors()], 401);
+            }
+
+            $input = $request->all();
+            $time = date("Y/m/d H:i:s");
+            $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->orderBy('id', 'desc')->first();
+            $user = User::find($results->cx_id);
+            $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            $results['cx_name'] = $user->name;
+            $results['cx_image_url'] = $user->image_url;
+            return response()->json(['success' => $results], $this->successStatus);
+        } else { // with id
+            $input = $request->all();
+            $results = Offer::where('cx_id', Auth::user()->id)->where('id', $id)->orderBy('id', 'desc')->first();
+            $user = User::find($results->cx_id);
+            $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            $results['cx_name'] = $user->name;
+            $results['cx_image_url'] = $user->image_url;
+            return response()->json(['success' => $results], $this->successStatus);
+        }
+    }
+
+    /**
+     * reservation as stylist
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function reserveList(Request $request)
+    {
+        $results = DB::table('requests as r')
+        ->select('r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
+        ->where('r.stylist_id', Auth::user()->id)
+        ->join('offers as o', 'o.id', '=', 'r.offer_id')
+        ->join('users as u', 'u.id', '=', 'o.cx_id')
+        ->get();
+
+        return response()->json(['success' => $results], $this->successStatus);
+    }
+
 }

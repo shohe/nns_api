@@ -35,7 +35,7 @@ class Offer extends Model
     static function getLocationAttribute(string $value)
     {
         $_value = substr($value, strlen('POINT('), strlen($value) - (strlen('POINT(') + 1));
-        $_value = explode(" ", $value);
+        $_value = explode(" ", $_value);
         $ret = [];
         $ret['lat'] = $_value[0];
         $ret['lng'] = $_value[1];
