@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use App\Offer;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class OfferController extends Controller
@@ -73,34 +74,50 @@ class OfferController extends Controller
         return response()->json(['success' => $offer], $this->successStatus);
     }
 
-
     /**
      *
      *
      * @return \Illuminate\Http\Response
      */
-    public function match(Request $request)
+    public function show($id = 0)
     {
-        $user = Auth::user();
-        if (!$user->is_stylist) {
-            return response()->json(['error'=>'this user is not stylist'], 401);
+        if ($id == 0) {
+            $user = Auth::user();
+            if (!$user->is_stylist) {
+                return response()->json(['error'=>'this user is not stylist'], 401);
+            }
+
+            // nominated
+            $nominatedOffer = Offer::query();
+            $nominatedOffer->where('is_closed', false);
+            $nominatedOffer->where('stylist_id', $user->id);
+            $nominatedOffer->orderBy('id', 'desc');
+
+            $nominatedOffer = DB::table('offers as o')
+            ->select('o.id as offer_id', 'u.name', 'u.image_url')
+            ->where('o.is_closed', false)
+            ->where('o.stylist_id', $user->id)
+            ->join('users as u', 'u.id', '=', 'o.cx_id');
+
+            // match required
+            $SL = $user->getSalonLocation();
+            $matchRequiredOffer = DB::table('offers as o')
+            ->select('o.id as offer_id', 'u.name', 'u.image_url')
+            ->where('o.is_closed', false)
+            ->where('o.stylist_id', null)
+            ->whereRaw("GLENGTH(GEOMFROMTEXT(CONCAT('LINESTRING(',?,' ',?, ',',X(from_location),' ',Y(from_location),')'))) <= o.distance_range * ?", [$SL['lat'], $SL['lng'], $this->oneKm])
+            ->join('users as u', 'u.id', '=', 'o.cx_id');
+
+            // marge offers
+            $results = $nominatedOffer->union($matchRequiredOffer)->get();
+            return response()->json(['success' => $results], $this->successStatus);
+        } else {
+            $results = Offer::find($id);
+            $user = User::find($results->cx_id);
+            $results['cx_name'] = $user->name;
+            $results['cx_image_url'] = $user->image_url;
+            return response()->json(['success' => $results], $this->successStatus);
         }
-
-        // nominated
-        $nominatedOffer = Offer::query();
-        $nominatedOffer->where('is_closed', false);
-        $nominatedOffer->where('stylist_id', $user->id);
-        $nominatedOffer->orderBy('id', 'desc');
-
-        // match required
-        $SL = $user->getSalonLocation();
-        $matchRequiredOffer = Offer::query();
-        $matchRequiredOffer->where('is_closed', false);
-        $matchRequiredOffer->where('stylist_id', null);
-        $matchRequiredOffer->whereRaw("GLENGTH(GEOMFROMTEXT(CONCAT('LINESTRING(',?,' ',?, ',',X(from_location),' ',Y(from_location),')'))) <= distance_range * ?", [$SL['lat'], $SL['lng'], $this->oneKm]);
-
-        // marge offers
-        $results = $nominatedOffer->union($matchRequiredOffer)->get();
-        return response()->json(['success' => $results], $this->successStatus);
     }
+
 }
