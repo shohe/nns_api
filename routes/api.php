@@ -24,6 +24,7 @@ Route::post('/user/login', 'UserController@login');
 Route::post('/user', 'UserController@register');
 Route::put('/user', 'UserController@update')->middleware('auth:api');
 Route::post('/user/image', 'UserController@storeImage')->middleware('auth:api');
+Route::get('/user/daycount', 'UserController@dayCounter')->middleware('auth:api');
 
 // OFFER
 Route::resource('/offer', 'OfferController')->middleware('auth:api');

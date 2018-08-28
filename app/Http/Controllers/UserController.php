@@ -217,4 +217,14 @@ class UserController extends Controller
         $url = $resouce.$url;
         return response()->json(['success' => $url], $this->successStatus);
     }
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function dayCounter()
+    {
+        return response()->json(['success' => 1], $this->successStatus);
+    }
 }
