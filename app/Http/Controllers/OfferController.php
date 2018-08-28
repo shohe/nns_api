@@ -114,6 +114,7 @@ class OfferController extends Controller
         } else {
             $results = Offer::find($id);
             $user = User::find($results->cx_id);
+            $results['from_location'] = $user->getSalonLocation();
             $results['cx_name'] = $user->name;
             $results['cx_image_url'] = $user->image_url;
             return response()->json(['success' => $results], $this->successStatus);
