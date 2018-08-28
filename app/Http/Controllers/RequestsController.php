@@ -141,15 +141,6 @@ class RequestsController extends Controller
      */
     public function reserveList(Request $request)
     {
-        // Validation
-        $validator = Validator::make($request->all(), [
-            'date_time' => 'required|date_format:Y-m-d H:i:s',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
-        }
-
         $results = DB::table('requests as r')
         ->select('r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
         ->where('r.stylist_id', Auth::user()->id)
