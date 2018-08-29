@@ -20,7 +20,6 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('image_url')->nullable();
             $table->string('status_comment')->default("");
-            $table->integer('charity_id')->default(1);
             $table->boolean('is_stylist')->default(false);
             $table->string('salon_name')->nullable();
             $table->string('salon_address')->nullable();

@@ -65,7 +65,6 @@ class OfferController extends Controller
         $input = $request->all();
         $user = Auth::user();
         $input['cx_id'] = $user->id;
-        $input['charity_id'] = $user->charity_id;
         if (isset($input['from_location_lat']) && isset($input['from_location_lng'])) {
             $geoArray = array('lat' => $input['from_location_lat'], 'lng' => $input['from_location_lng']);
             $input['from_location'] = Offer::castToGeometry($geoArray);

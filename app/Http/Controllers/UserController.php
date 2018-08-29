@@ -151,7 +151,6 @@ class UserController extends Controller
             'password' => 'min:8|max:16',
             'image_url' => 'string',
             'status_comment' => 'string|max:255',
-            'charity_id' => 'integer',
             'is_stylist' => 'boolean',
             'salon_name' => 'string|max:30',
             'salon_address' => 'string|max:100',
@@ -172,7 +171,6 @@ class UserController extends Controller
         if (isset($input['password'])) { $user->password = $input['password']; }
         if (isset($input['image_url'])) { $user->image_url = $input['image_url']; }
         if (isset($input['status_comment'])) { $user->status_comment = $input['status_comment']; }
-        if (isset($input['charity_id'])) { $user->charity_id = $input['charity_id']; }
         if (isset($input['is_stylist'])) { $user->is_stylist = $input['is_stylist']; }
         if (isset($input['salon_name'])) { $user->salon_name = $input['salon_name']; }
         if (isset($input['salon_address'])) { $user->salon_address = $input['salon_address']; }

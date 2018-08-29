@@ -24,7 +24,6 @@ class CreateOffersTable extends Migration
             $table->integer('stylist_id')->nullable();
             $table->integer('hair_type');
             $table->string('comment')->default("");
-            $table->integer('charity_id');
             $table->boolean('is_closed')->default(false);
             $table->timestamps();
         });
