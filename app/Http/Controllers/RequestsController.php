@@ -155,10 +155,10 @@ class RequestsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function reserveList(Request $request)
+    public function reservationList(Request $request)
     {
         $results = DB::table('requests as r')
-        ->select('r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
+        ->select('o.id as offer_id', 'r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
         ->where('r.stylist_id', Auth::user()->id)
         ->join('offers as o', 'o.id', '=', 'r.offer_id')
         ->join('users as u', 'u.id', '=', 'o.cx_id')
