@@ -87,7 +87,26 @@ class ReviewController extends Controller
      */
     public function show($id)
     {
-        return response()->json(['success' => 1], $this->successStatus);
+        // reviews
+        $user = User::find($id);
+        $result = DB::table('reviews as r')
+        ->select('u.name as writer_name', 'r.star', 'r.comment', 'r.created_at')
+        ->where('r.deal_user_id', $user->id)
+        ->join('users as u', 'u.id', '=', 'r.write_user_id')
+        ->get();
+
+        // evaluate
+        $reviews = Review::where('deal_user_id', $user->id);
+        $evaluate['average'] = $reviews->avg('star');
+        for ($i=1; $i <= 5 ; $i++) { $evaluate[$i] = clone $reviews; }
+        for ($i=1; $i <= 5 ; $i++) { $evaluate[$i] = $evaluate[$i]->where('star', $i)->count(); }
+
+        // user
+        $_user['image_url'] = $user->image_url;
+        $_user['star'] = floor($evaluate['average']);
+        $_user['status_comment'] = $user->status_comment;
+
+        return response()->json(['success' => $result, 'evaluate' => $evaluate, 'user' => $_user], $this->successStatus);
     }
 
 }
