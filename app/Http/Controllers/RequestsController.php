@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Requests;
+use App\Review;
 use App\Offer;
 use App\User;
 use Illuminate\Support\Facades\Auth;
@@ -81,11 +82,23 @@ class RequestsController extends Controller
             $all = DB::table('requests as r')->select('r.id as request_id', 'u.name', 'u.image_url')->join('users as u', 'u.id', '=', 'r.stylist_id')->get();
             return response()->json(['success' => $all], $this->successStatus);
         } else {
-            $result = Requests::find($id);
-            $stylist = User::find($result->stylist_id);
-            $stylist['salon_location'] = $stylist->getSalonLocation();
-            $result['stylist'] = $stylist;
-            return response()->json(['success' => $result], $this->successStatus);
+            // request
+            $requests = Requests::find($id);
+            // stylist
+            $user = User::find($requests->stylist_id);
+            $stylist['name'] = $user->name;
+            $stylist['image_url'] = $user->image_url;
+            $stylist['status_comment'] = $user->status_comment;
+            $stylist['salon_name'] = $user->salon_name;
+            $stylist['salon_address'] = $user->salon_address;
+            $stylist['salon_location'] = $user->getSalonLocation();
+            // review
+            $_reviews = Review::where('deal_user_id', $user->id);
+            $reviews = $_reviews->get();
+            $reviews['average'] = floor($_reviews->avg('star'));
+
+
+            return response()->json(['success' => $requests, 'stylist' => $stylist, 'reviews' => $reviews], $this->successStatus);
         }
     }
 
@@ -120,7 +133,7 @@ class RequestsController extends Controller
             }
 
             $input = $request->all();
-            $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->where('is_closed', false)->orderBy('id', 'desc')->first();
+            $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->orderBy('id', 'desc')->first();
             $user = User::find($results->cx_id);
             $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
             $results['cx_name'] = $user->name;
