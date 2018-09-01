@@ -37,8 +37,8 @@ class Offer extends Model
         $_value = substr($value, strlen('POINT('), strlen($value) - (strlen('POINT(') + 1));
         $_value = explode(" ", $_value);
         $ret = [];
-        $ret['lat'] = $_value[0];
-        $ret['lng'] = $_value[1];
+        $ret['lat'] = floatval($_value[0]);
+        $ret['lng'] = floatval($_value[1]);
         return $ret;
     }
 

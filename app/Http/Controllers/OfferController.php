@@ -70,7 +70,10 @@ class OfferController extends Controller
             $input['from_location'] = Offer::castToGeometry($geoArray);
         }
         $offer = Offer::create($input);
-        return response()->json(['success' => $offer], $this->successStatus);
+
+        $_offer = Offer::find($offer->id);
+        $_offer->from_location = Offer::getLocationAttribute($_offer->from_location);
+        return response()->json(['success' => $_offer], $this->successStatus);
     }
 
     /**
