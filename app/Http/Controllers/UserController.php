@@ -179,7 +179,9 @@ class UserController extends Controller
             $user->setSalonLocation($geoArray);
         }
         $user->save();
-        return response()->json(['success' => $user], $this->successStatus);
+        $_user = User::find($user->id);
+        $_user->salon_location = $_user->getSalonLocation();
+        return response()->json(['success' => $_user], $this->successStatus);
     }
 
 
