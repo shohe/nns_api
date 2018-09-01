@@ -33,7 +33,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $user->salon_location = $user->getSalonLocation();
+        return response()->json(['success'=>$user], $this->successStatus);
     }
 
     /**
