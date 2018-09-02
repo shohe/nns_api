@@ -72,7 +72,9 @@ class OfferController extends Controller
         $offer = Offer::create($input);
 
         $_offer = Offer::find($offer->id);
-        $_offer->from_location = Offer::getLocationAttribute($_offer->from_location);
+        if (!isset($_offer->stylist_id)) {
+            $_offer->from_location = Offer::getLocationAttribute($_offer->from_location);
+        }
         return response()->json(['success' => $_offer], $this->successStatus);
     }
 
@@ -90,11 +92,6 @@ class OfferController extends Controller
             }
 
             // nominated
-            $nominatedOffer = Offer::query();
-            $nominatedOffer->where('is_closed', false);
-            $nominatedOffer->where('stylist_id', $user->id);
-            $nominatedOffer->orderBy('id', 'desc');
-
             $nominatedOffer = DB::table('offers as o')
             ->select('o.id as offer_id', 'u.name', 'u.image_url')
             ->where('o.is_closed', false)
@@ -111,12 +108,15 @@ class OfferController extends Controller
             ->join('users as u', 'u.id', '=', 'o.cx_id');
 
             // marge offers
-            $results = $nominatedOffer->union($matchRequiredOffer)->get();
-            return response()->json(['success' => $results], $this->successStatus);
+            return response()->json(['nominated' => $nominatedOffer->get(), 'located' => $matchRequiredOffer->get()], $this->successStatus);
+            //$results = $nominatedOffer->union($matchRequiredOffer)->get();
+            //return response()->json(['success' => $results], $this->successStatus);
         } else {
             $results = Offer::find($id);
             $user = User::find($results->cx_id);
-            $results['from_location'] = $user->getSalonLocation();
+            if (!isset($results->stylist_id)) {
+                $results['from_location'] = Offer::getLocationAttribute($results->from_location);
+            }
             $results['cx_name'] = $user->name;
             $results['cx_image_url'] = $user->image_url;
             return response()->json(['success' => $results], $this->successStatus);
