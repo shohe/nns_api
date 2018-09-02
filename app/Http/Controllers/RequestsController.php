@@ -60,6 +60,8 @@ class RequestsController extends Controller
         $input = $request->all();
         $input['stylist_id'] = Auth::user()->id;
         $request = Requests::create($input);
+        $request->offer_id = (int)$request->offer_id;
+        $request->price = floatval($request->price);
 
         // update offer
         if (Requests::where('offer_id', $input['offer_id'])->count() >= env('REQUEST_MAX')) {
