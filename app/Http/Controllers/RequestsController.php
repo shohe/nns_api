@@ -137,7 +137,9 @@ class RequestsController extends Controller
             $input = $request->all();
             $results = Offer::where('cx_id', Auth::user()->id)->where('date_time', '>', $input['date_time'])->orderBy('id', 'desc')->first();
             $user = User::find($results->cx_id);
-            $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            if (isset($results['from_location'])) {
+                $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            }
             $results['cx_name'] = $user->name;
             $results['cx_image_url'] = $user->image_url;
             return response()->json(['success' => $results], $this->successStatus);
@@ -145,7 +147,9 @@ class RequestsController extends Controller
             $input = $request->all();
             $results = Offer::where('cx_id', Auth::user()->id)->where('id', $id)->orderBy('id', 'desc')->first();
             $user = User::find($results->cx_id);
-            $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            if (isset($results['from_location'])) {
+                $results['from_location'] = Offer::getLocationAttribute($results['from_location']);
+            }
             $results['cx_name'] = $user->name;
             $results['cx_image_url'] = $user->image_url;
             return response()->json(['success' => $results], $this->successStatus);
