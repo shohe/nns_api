@@ -77,7 +77,8 @@ class ReviewController extends Controller
         $input = $request->all();
         $input['write_user_id'] = Auth::user()->id;
         $review = Review::create($input);
-        return response()->json(['success' => $review], $this->successStatus);
+        $_review = Review::find($review->id);
+        return response()->json(['success' => $_review], $this->successStatus);
     }
 
     /**
