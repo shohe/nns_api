@@ -43,7 +43,7 @@ class ReviewController extends Controller
 
         // evaluate
         $reviews = Review::where('deal_user_id', $user->id);
-        $evaluate['average'] = $reviews->avg('star');
+        $evaluate['average'] = floatval($reviews->avg('star'));
         for ($i=1; $i <= 5 ; $i++) { $evaluate[$i] = clone $reviews; }
         for ($i=1; $i <= 5 ; $i++) { $evaluate[$i] = $evaluate[$i]->where('star', $i)->count(); }
 
