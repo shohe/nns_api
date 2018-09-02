@@ -154,7 +154,7 @@ class OfferController extends Controller
         ->where('r.is_matched', true)
         ->join('requests as r', 'o.id', '=', 'r.offer_id')
         ->join('users as u', 'u.id', '=', 'r.stylist_id')
-        ->get();
+        ->first();
         return response()->json(['success' => $results], $this->successStatus);
     }
 
