@@ -34,7 +34,9 @@ class UserController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user->salon_location = $user->getSalonLocation();
+        if (isset($user->salon_location)) {
+            $user->salon_location = $user->getSalonLocation();
+        }
         return response()->json(['success'=>$user], $this->successStatus);
     }
 
@@ -182,7 +184,9 @@ class UserController extends Controller
         }
         $user->save();
         $_user = User::find($user->id);
-        $_user->salon_location = $_user->getSalonLocation();
+        if (isset($_user->salon_location)) {
+            $_user->salon_location = $_user->getSalonLocation();
+        }
         return response()->json(['success' => $_user], $this->successStatus);
     }
 

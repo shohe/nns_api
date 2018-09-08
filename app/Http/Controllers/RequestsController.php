@@ -81,7 +81,13 @@ class RequestsController extends Controller
     public function show($id = 0)
     {
         if ($id == 0) {
-            $all = DB::table('requests as r')->select('r.id as request_id', 'u.name', 'u.image_url')->join('users as u', 'u.id', '=', 'r.stylist_id')->get();
+            $all = DB::table('requests as r')
+            ->select('r.id as request_id', 'u.name', 'u.image_url')
+            ->where('o.cx_id', Auth::user()->id)
+            ->where('r.is_matched', false)
+            ->join('offers as o', 'o.id', '=', 'r.offer_id')
+            ->join('users as u', 'u.id', '=', 'r.stylist_id')
+            ->get();
             return response()->json(['success' => $all], $this->successStatus);
         } else {
             // request
