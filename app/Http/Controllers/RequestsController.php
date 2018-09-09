@@ -101,12 +101,18 @@ class RequestsController extends Controller
             $stylist['salon_address'] = $user->salon_address;
             $stylist['salon_location'] = $user->getSalonLocation();
             // review
-            $_reviews = Review::where('deal_user_id', $user->id);
-            $reviews = $_reviews->get();
-            $reviews['average'] = floor($_reviews->avg('star'));
+            // $_reviews = Review::where('deal_user_id', $user->id);
+            // $reviews = $_reviews->get();
+            $reviews = DB::table('reviews as r')
+            ->select('r.id', 'r.star', 'r.comment', 'r.created_at', 'u.name')
+            ->where('r.deal_user_id', $user->id)
+            ->join('users as u', 'u.id', '=', 'r.write_user_id')
+            ->get();
+            // $average = floor($_reviews->avg('star'));
+            $average = floor($reviews->avg('star'));
 
 
-            return response()->json(['success' => $requests, 'stylist' => $stylist, 'reviews' => $reviews], $this->successStatus);
+            return response()->json(['success' => $requests, 'stylist' => $stylist, 'reviews' => $reviews, 'average' => $average], $this->successStatus);
         }
     }
 
