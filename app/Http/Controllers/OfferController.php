@@ -131,7 +131,7 @@ class OfferController extends Controller
     public function offerHistoryList()
     {
         $results = DB::table('offers as o')
-        ->select('r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
+        ->select('o.id' ,'r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
         ->where('o.cx_id', Auth::user()->id)
         ->where('o.is_closed', true)
         ->where('r.is_matched', true)
