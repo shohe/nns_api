@@ -254,9 +254,21 @@ class UserController extends Controller
             $date = strtotime($offer->first()->date_time);
             $today = strtotime($input['date_time']);
             $dif = $this->time_diff($today, $date);
-            return response()->json(['success' => $dif, 'origin' => $offer->first()->date_time], $this->successStatus);
+            return response()->json(['success' => $dif, 'origin' => $offer->first()->date_time, 'matched' => true], $this->successStatus);
+        } else {
+            $offer = DB::table('offers as o')
+            ->select('o.date_time')
+            ->where('o.date_time', '>', $input['date_time'])
+            ->where('o.is_closed', false)
+            ->where('o.cx_id', Auth::user()->id);
+            if ($offer->count() > 0) {
+                $date = strtotime($offer->first()->date_time);
+                $today = strtotime($input['date_time']);
+                $dif = $this->time_diff($today, $date);
+                return response()->json(['success' => $dif, 'origin' => $offer->first()->date_time, 'matched' => false], $this->successStatus);
+            }
         }
-        return response()->json(['success' => 0], $this->successStatus);
+        return response()->json(['success' => -1, 'origin' => $offer->first()->date_time], $this->successStatus);
     }
 
     private function time_diff($time_from, $time_to)
@@ -267,4 +279,5 @@ class UserController extends Controller
         $dif_days = (strtotime(date("Y-m-d", $dif)) - strtotime("1970-01-01")) / 86400;
         return $dif_days;
     }
+
 }

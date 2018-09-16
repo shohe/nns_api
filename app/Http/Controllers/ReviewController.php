@@ -106,6 +106,9 @@ class ReviewController extends Controller
         $_user['image_url'] = $user->image_url;
         $_user['star'] = floor($evaluate['average']);
         $_user['status_comment'] = $user->status_comment;
+        $_user['salon_name'] = (isset($user->salon_name)) ? $user->salon_name : null;
+        $_user['salon_address'] = (isset($user->salon_address)) ? $user->salon_address : null;
+        $_user['salon_location'] = (isset($user->salon_location)) ? $user->getSalonLocation() : null;
 
         return response()->json(['success' => $result, 'evaluate' => $evaluate, 'user' => $_user], $this->successStatus);
     }

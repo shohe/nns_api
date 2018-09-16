@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Offer;
+use App\Review;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Validator;
@@ -114,13 +115,39 @@ class OfferController extends Controller
         } else {
             $results = Offer::find($id);
             $user = User::find($results->cx_id);
+            $reviews = Review::where('deal_user_id', $user->id);
             if (!isset($results->stylist_id)) {
                 $results['from_location'] = Offer::getLocationAttribute($results->from_location);
             }
             $results['cx_name'] = $user->name;
             $results['cx_image_url'] = $user->image_url;
+            $results['cx_status_comment'] = $user->status_comment;
+            $results['average'] = $reviews->avg('star');
             return response()->json(['success' => $results], $this->successStatus);
         }
+    }
+
+    /**
+     *
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function cancel(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+
+        // update offer
+        $input = $request->all();
+        $offer = Offer::find($input['id']);
+        $offer->is_closed = true;
+        $offer->save();
+        return response()->json(['success' => true], $this->successStatus);
     }
 
     /**
@@ -149,13 +176,15 @@ class OfferController extends Controller
     public function offerHistory($id)
     {
         $results = DB::table('offers as o')
-        ->select('u.id', 'u.name', 'u.image_url', 'u.status_comment', 'o.menu', 'r.price', 'o.date_time', 'o.hair_type', 'r.comment')
+        ->select('u.id', 'u.name', 'u.image_url', 'u.status_comment', 'o.menu', 'r.price', 'o.date_time', 'o.hair_type', 'r.comment', 'u.salon_name')
         ->where('o.id', $id)
         ->where('r.is_matched', true)
         ->join('requests as r', 'o.id', '=', 'r.offer_id')
         ->join('users as u', 'u.id', '=', 'r.stylist_id')
         ->first();
-        return response()->json(['success' => $results], $this->successStatus);
+        $reviews = Review::where('deal_user_id', $results->id);
+        $star = round($reviews->avg('star'));
+        return response()->json(['success' => $results, 'star' => $star], $this->successStatus);
     }
 
 }

@@ -30,6 +30,7 @@ Route::get('/user/daycount', 'UserController@dayCounter')->middleware('auth:api'
 // OFFER
 Route::resource('/offer', 'OfferController')->middleware('auth:api');
 Route::get('/offer', 'OfferController@show')->middleware('auth:api');
+Route::put('/offer', 'OfferController@cancel')->middleware('auth:api');
 
 // REQUEST
 Route::resource('/request', 'RequestsController')->middleware('auth:api');
@@ -45,4 +46,4 @@ Route::get('/offerHistory/{id}', 'OfferController@offerHistory')->middleware('au
 
 // REVIEWS
 Route::resource('/review', 'ReviewController')->middleware('auth:api');
-Route::get('/review/{id}', 'OfferController@show')->middleware('auth:api');
+// Route::get('/review/{id}', 'OfferController@show')->middleware('auth:api');
