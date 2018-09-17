@@ -39,6 +39,7 @@ class ReviewController extends Controller
         ->select('u.name as writer_name', 'r.star', 'r.comment', 'r.created_at')
         ->where('r.deal_user_id', $user->id)
         ->join('users as u', 'u.id', '=', 'r.write_user_id')
+        ->orderBy('r.id','desc')
         ->get();
 
         // evaluate
@@ -94,6 +95,7 @@ class ReviewController extends Controller
         ->select('u.name as writer_name', 'r.star', 'r.comment', 'r.created_at')
         ->where('r.deal_user_id', $user->id)
         ->join('users as u', 'u.id', '=', 'r.write_user_id')
+        ->orderBy('r.id','desc')
         ->get();
 
         // evaluate
