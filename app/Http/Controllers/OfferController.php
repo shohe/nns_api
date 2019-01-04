@@ -122,7 +122,7 @@ class OfferController extends Controller
             $results['cx_name'] = $user->name;
             $results['cx_image_url'] = $user->image_url;
             $results['cx_status_comment'] = $user->status_comment;
-            $results['average'] = $reviews->avg('star');
+            $results['average'] = round($reviews->avg('star'));
             return response()->json(['success' => $results], $this->successStatus);
         }
     }
@@ -155,17 +155,29 @@ class OfferController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function offerHistoryList()
+    public function offerHistoryList($isStylist)
     {
-        $results = DB::table('offers as o')
-        ->select('o.id' ,'r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
-        ->where('o.cx_id', Auth::user()->id)
-        ->where('o.is_closed', true)
-        ->where('r.is_matched', true)
-        ->join('requests as r', 'o.id', '=', 'r.offer_id')
-        ->join('users as u', 'u.id', '=', 'r.stylist_id')
-        ->get();
-        return response()->json(['success' => $results], $this->successStatus);
+        if ($isStylist) {
+            $results = DB::table('offers as o')
+            ->select('o.id' ,'r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
+            ->where('r.stylist_id', Auth::user()->id)
+            ->where('o.is_closed', true)
+            ->where('r.is_matched', true)
+            ->join('requests as r', 'o.id', '=', 'r.offer_id')
+            ->join('users as u', 'u.id', '=', 'o.cx_id')
+            ->get();
+            return response()->json(['success' => $results], $this->successStatus);
+        } else {
+            $results = DB::table('offers as o')
+            ->select('o.id' ,'r.price', 'o.date_time', 'o.menu', 'u.image_url', 'u.name')
+            ->where('o.cx_id', Auth::user()->id)
+            ->where('o.is_closed', true)
+            ->where('r.is_matched', true)
+            ->join('requests as r', 'o.id', '=', 'r.offer_id')
+            ->join('users as u', 'u.id', '=', 'r.stylist_id')
+            ->get();
+            return response()->json(['success' => $results], $this->successStatus);
+        }
     }
 
     /**

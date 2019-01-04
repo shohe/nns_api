@@ -126,7 +126,7 @@ class RequestsController extends Controller
         $requests = Requests::find($id);
         $requests->is_matched = true;
         $requests->save();
-        return response()->json(['success' => true], $this->successStatus);
+        return response()->json(['success' => true, 'stylist_id' => $requests->stylist_id], $this->successStatus);
     }
 
     /**

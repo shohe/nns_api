@@ -259,7 +259,7 @@ class UserController extends Controller
             $offer = DB::table('offers as o')
             ->select('o.date_time')
             ->where('o.date_time', '>', $input['date_time'])
-            ->where('o.is_closed', false)
+            // ->where('o.is_closed', false)
             ->where('o.cx_id', Auth::user()->id);
             if ($offer->count() > 0) {
                 $date = strtotime($offer->first()->date_time);
